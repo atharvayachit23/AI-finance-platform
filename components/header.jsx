@@ -10,67 +10,69 @@ const Header = async () => {
 
   return (
     <header className="fixed top-4 left-0 right-0 w-full z-50 flex justify-center px-4">
-      <nav className="container glass-card rounded-full px-6 py-3 flex items-center justify-between transition-all duration-300 hover:border-primary/40">
+      <nav className="container glass-card rounded-full px-4 md:px-6 py-3 flex items-center justify-between transition-all duration-300 hover:border-primary/40">
         
-        {/* Brand Section - Swapped AXON for WELTH */}
+        {/* Brand Section */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-glow group-hover:rotate-12 transition-transform duration-300">
             <Zap className="h-5 w-5 text-black fill-current" />
           </div>
-          <span className="text-xl font-black tracking-tighter text-white uppercase italic">
+          {/* Hidden text on very small screens to save space, visible on sm and up */}
+          <span className="hidden xs:block text-xl font-black tracking-tighter text-white uppercase italic">
             WELTH<span className="text-primary">_</span>
           </span>
         </Link>
 
         {/* Right-aligned Navigation & Actions Wrapper */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
           
-          {/* Navigation Links - Now moved to the right side next to buttons */}
-          <div className="hidden md:flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/5 mr-2">
+          {/* Navigation Links - Now visible on mobile too */}
+          <div className="flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/5 mr-1 md:mr-2">
             <SignedOut>
-              <a href="#features" className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors flex items-center gap-2">
-                <Globe size={12} /> Protocol
+              <a href="#features" className="px-2 md:px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors flex items-center gap-2">
+                <Globe size={12} /> <span className="hidden sm:inline">Protocol</span>
               </a>
-              <a href="#testimonials" className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors flex items-center gap-2">
-                <MessageSquare size={12} /> Feedback
+              <a href="#testimonials" className="px-2 md:px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors flex items-center gap-2">
+                <MessageSquare size={12} /> <span className="hidden sm:inline">Feedback</span>
               </a>
             </SignedOut>
             
             <SignedIn>
               <Link href="/dashboard">
-                <Button variant="ghost" className="rounded-full text-slate-300 hover:text-primary hover:bg-primary/10 gap-2 h-9 text-xs font-bold uppercase tracking-wider">
+                <Button variant="ghost" className="rounded-full text-slate-300 hover:text-primary hover:bg-primary/10 gap-2 h-9 text-[10px] md:text-xs font-bold uppercase tracking-wider px-3 md:px-4">
                   <LayoutDashboard size={14} />
-                  <span>Insights</span>
+                  <span className="hidden sm:inline">Insights</span>
                 </Button>
               </Link>
             </SignedIn>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 md:space-x-3">
             <SignedIn>
               <Link href="/transaction/create">
-                <Button className="hidden sm:flex items-center gap-2 bg-primary text-black hover:bg-emerald-400 rounded-full font-black text-xs uppercase tracking-tighter shadow-glow border-none transition-all active:scale-95 h-9 px-5">
+                {/* Removed 'hidden sm:flex' so it shows on mobile */}
+                <Button className="flex items-center gap-2 bg-primary text-black hover:bg-emerald-400 rounded-full font-black text-[10px] md:text-xs uppercase tracking-tighter shadow-glow border-none transition-all active:scale-95 h-9 px-3 md:px-5">
                   <PenBox size={14} />
-                  <span>New_Record</span>
+                  <span className="hidden xs:inline">New_Record</span>
                 </Button>
               </Link>
             </SignedIn>
 
             <SignedOut>
               <SignInButton forceRedirectUrl="/dashboard">
-                <Button className="bg-white text-black hover:bg-slate-200 rounded-full font-black text-xs uppercase tracking-widest px-6 h-9 border-none transition-all">
+                <Button className="bg-white text-black hover:bg-slate-200 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest px-4 md:px-6 h-9 border-none transition-all">
                   Login
                 </Button>
               </SignInButton>
             </SignedOut>
 
             <SignedIn>
-              <div className="border-l border-white/10 pl-3 ml-1">
+              <div className="border-l border-white/10 pl-2 md:pl-3 ml-1">
                 <UserButton
                   appearance={{
                     elements: {
-                      avatarBox: "w-9 h-9 rounded-xl border-2 border-primary/20 hover:border-primary transition-all shadow-sm",
+                      avatarBox: "w-8 h-8 md:w-9 md:h-9 rounded-xl border-2 border-primary/20 hover:border-primary transition-all shadow-sm",
                     },
                   }}
                 />

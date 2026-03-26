@@ -10,14 +10,13 @@ const Header = async () => {
 
   return (
     <header className="fixed top-4 left-0 right-0 w-full z-50 flex justify-center px-4">
-      <nav className="container glass-card rounded-full px-4 md:px-6 py-3 flex items-center justify-between transition-all duration-300 hover:border-primary/40">
+      <nav className="w-full max-w-7xl mx-auto glass-card rounded-full px-4 md:px-6 py-3 flex items-center justify-between transition-all duration-300 hover:border-primary/40">
         
         {/* Brand Section */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-glow group-hover:rotate-12 transition-transform duration-300">
             <Zap className="h-5 w-5 text-black fill-current" />
           </div>
-          {/* Hidden text on very small screens to save space, visible on sm and up */}
           <span className="hidden xs:block text-xl font-black tracking-tighter text-white uppercase italic">
             WELTH<span className="text-primary">_</span>
           </span>
@@ -26,7 +25,6 @@ const Header = async () => {
         {/* Right-aligned Navigation & Actions Wrapper */}
         <div className="flex items-center gap-2 md:gap-3">
           
-          {/* Navigation Links - Now visible on mobile too */}
           <div className="flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/5 mr-1 md:mr-2">
             <SignedOut>
               <a href="#features" className="px-2 md:px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors flex items-center gap-2">
@@ -47,11 +45,9 @@ const Header = async () => {
             </SignedIn>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex items-center space-x-2 md:space-x-3">
             <SignedIn>
               <Link href="/transaction/create">
-                {/* Removed 'hidden sm:flex' so it shows on mobile */}
                 <Button className="flex items-center gap-2 bg-primary text-black hover:bg-emerald-400 rounded-full font-black text-[10px] md:text-xs uppercase tracking-tighter shadow-glow border-none transition-all active:scale-95 h-9 px-3 md:px-5">
                   <PenBox size={14} />
                   <span className="hidden xs:inline">New_Record</span>

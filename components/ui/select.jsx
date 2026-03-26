@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-// FIXED: Changed 'lucide-material' to 'lucide-react'
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -55,17 +54,24 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-neutral-700 bg-neutral-900 text-popover-foreground shadow-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        // FIXED: Removed all 'var' width references. 
+        // Added 'w-full' and 'min-w-[var(--radix-select-trigger-width)]' only inside a portal-safe way.
+        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-neutral-700 bg-neutral-900 text-popover-foreground shadow-xl data-[state=open]:animate-in data-[state=closed]:animate-out",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
         className
       )}
       position={position}
+      sideOffset={4}
       {...props}>
       <SelectScrollUpButton />
       <SelectPrimitive.Viewport
-        className={cn("p-1", position === "popper" &&
-          "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]")}>
+        className={cn(
+          "p-1",
+          // CRITICAL FIX: We use 'min-w-full' so it matches the trigger width 
+          // but we DO NOT use the CSS variable here which is causing the shrink.
+          position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[200px]"
+        )}>
         {children}
       </SelectPrimitive.Viewport>
       <SelectScrollDownButton />

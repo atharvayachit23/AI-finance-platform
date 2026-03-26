@@ -14,30 +14,78 @@ const serializeAmount = (obj) => ({
   amount: obj.amount.toNumber(),
 });
 
+// ---------------- CATEGORY HELPERS ----------------
+const allowedCategories = [
+  "housing", "transportation", "groceries", "utilities",
+  "entertainment", "food", "shopping", "healthcare",
+  "medicine", "education", "personal", "travel",
+  "insurance", "gifts", "bills", "other-expense"
+];
+
+function normalizeCategory(category) {
+  let cat = (category || "").toLowerCase().trim();
+
+  if (!allowedCategories.includes(cat)) {
+    cat = "other-expense";
+  }
+
+  return cat;
+}
+
+function fallbackCategory(description) {
+  const desc = (description || "").toLowerCase();
+
+  if (desc.includes("uber") || desc.includes("ola") || desc.includes("taxi")) {
+    return "transportation";
+  } else if (
+    desc.includes("zomato") ||
+    desc.includes("swiggy") ||
+    desc.includes("restaurant") ||
+    desc.includes("cafe")
+  ) {
+    return "food";
+  } else if (
+    desc.includes("amazon") ||
+    desc.includes("flipkart") ||
+    desc.includes("mall")
+  ) {
+    return "shopping";
+  } else if (
+    desc.includes("hospital") ||
+    desc.includes("clinic")
+  ) {
+    return "healthcare";
+  } else if (
+    desc.includes("pharmacy") ||
+    desc.includes("medical store")
+  ) {
+    return "medicine";
+  }
+
+  return "other-expense";
+}
+// --------------------------------------------------
+
 // Create Transaction
 export async function createTransaction(data) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    // Get request data for ArcJet
     const req = await request();
 
-    // Check rate limit
     const decision = await aj.protect(req, {
       userId,
-      requested: 1, // Specify how many tokens to consume
+      requested: 1,
     });
 
     if (decision.isDenied()) {
       if (decision.reason.isRateLimit()) {
         const { remaining, reset } = decision.reason;
+
         console.error({
           code: "RATE_LIMIT_EXCEEDED",
-          details: {
-            remaining,
-            resetInSeconds: reset,
-          },
+          details: { remaining, resetInSeconds: reset },
         });
 
         throw new Error("Too many requests. Please try again later.");
@@ -50,9 +98,7 @@ export async function createTransaction(data) {
       where: { clerkUserId: userId },
     });
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+    if (!user) throw new Error("User not found");
 
     const account = await db.account.findUnique({
       where: {
@@ -61,15 +107,14 @@ export async function createTransaction(data) {
       },
     });
 
-    if (!account) {
-      throw new Error("Account not found");
-    }
+    if (!account) throw new Error("Account not found");
 
-    // Calculate new balance
-    const balanceChange = data.type === "EXPENSE" ? -data.amount : data.amount;
-    const newBalance = account.balance.toNumber() + balanceChange;
+    const balanceChange =
+      data.type === "EXPENSE" ? -data.amount : data.amount;
 
-    // Create transaction and update account balance
+    const newBalance =
+      account.balance.toNumber() + balanceChange;
+
     const transaction = await db.$transaction(async (tx) => {
       const newTransaction = await tx.transaction.create({
         data: {
@@ -77,7 +122,10 @@ export async function createTransaction(data) {
           userId: user.id,
           nextRecurringDate:
             data.isRecurring && data.recurringInterval
-              ? calculateNextRecurringDate(data.date, data.recurringInterval)
+              ? calculateNextRecurringDate(
+                  data.date,
+                  data.recurringInterval
+                )
               : null,
         },
       });
@@ -132,20 +180,17 @@ export async function updateTransaction(id, data) {
 
     if (!user) throw new Error("User not found");
 
-    // Get original transaction to calculate balance change
     const originalTransaction = await db.transaction.findUnique({
       where: {
         id,
         userId: user.id,
       },
-      include: {
-        account: true,
-      },
+      include: { account: true },
     });
 
-    if (!originalTransaction) throw new Error("Transaction not found");
+    if (!originalTransaction)
+      throw new Error("Transaction not found");
 
-    // Calculate balance changes
     const oldBalanceChange =
       originalTransaction.type === "EXPENSE"
         ? -originalTransaction.amount.toNumber()
@@ -154,25 +199,24 @@ export async function updateTransaction(id, data) {
     const newBalanceChange =
       data.type === "EXPENSE" ? -data.amount : data.amount;
 
-    const netBalanceChange = newBalanceChange - oldBalanceChange;
+    const netBalanceChange =
+      newBalanceChange - oldBalanceChange;
 
-    // Update transaction and account balance in a transaction
     const transaction = await db.$transaction(async (tx) => {
       const updated = await tx.transaction.update({
-        where: {
-          id,
-          userId: user.id,
-        },
+        where: { id, userId: user.id },
         data: {
           ...data,
           nextRecurringDate:
             data.isRecurring && data.recurringInterval
-              ? calculateNextRecurringDate(data.date, data.recurringInterval)
+              ? calculateNextRecurringDate(
+                  data.date,
+                  data.recurringInterval
+                )
               : null,
         },
       });
 
-      // Update account balance
       await tx.account.update({
         where: { id: data.accountId },
         data: {
@@ -204,21 +248,15 @@ export async function getUserTransactions(query = {}) {
       where: { clerkUserId: userId },
     });
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+    if (!user) throw new Error("User not found");
 
     const transactions = await db.transaction.findMany({
       where: {
         userId: user.id,
         ...query,
       },
-      include: {
-        account: true,
-      },
-      orderBy: {
-        date: "desc",
-      },
+      include: { account: true },
+      orderBy: { date: "desc" },
     });
 
     return { success: true, data: transactions };
@@ -227,35 +265,42 @@ export async function getUserTransactions(query = {}) {
   }
 }
 
-// Scan Receipt
+// ---------------- SCAN RECEIPT ----------------
 export async function scanReceipt(file) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+    });
 
-    // Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
-    // Convert ArrayBuffer to Base64
     const base64String = Buffer.from(arrayBuffer).toString("base64");
 
     const prompt = `
-      Analyze this receipt image and extract the following information in JSON format:
-      - Total amount (just the number)
-      - Date (in ISO format)
-      - Description or items purchased (brief summary)
-      - Merchant/store name
-      - Suggested category (one of: housing,transportation,groceries,utilities,entertainment,food,shopping,healthcare,education,personal,travel,insurance,gifts,bills,other-expense )
-      
-      Only respond with valid JSON in this exact format:
-      {
-        "amount": number,
-        "date": "ISO date string",
-        "description": "string",
-        "merchantName": "string",
-        "category": "string"
-      }
+Analyze this receipt image and extract the following information in JSON format:
+- Total amount (just the number)
+- Date (in ISO format)
+- Description or items purchased (brief summary)
+- Merchant/store name
+- Suggested category
 
-      If its not a recipt, return an empty object
-    `;
+You MUST return EXACTLY one value from this list:
+["housing","transportation","groceries","utilities","entertainment","food","shopping","healthcare","medicine","education","personal","travel","insurance","gifts","bills","other-expense"]
+
+STRICT RULES:
+- No variations
+- No extra spaces
+- Lowercase only
+- If unsure, return "other-expense"
+
+Return ONLY valid JSON:
+{
+  "amount": number,
+  "date": "ISO date string",
+  "description": "string",
+  "merchantName": "string",
+  "category": "string"
+}
+`;
 
     const result = await model.generateContent([
       {
@@ -271,26 +316,29 @@ export async function scanReceipt(file) {
     const text = response.text();
     const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
 
-    try {
-      const data = JSON.parse(cleanedText);
-      return {
-        amount: parseFloat(data.amount),
-        date: new Date(data.date),
-        description: data.description,
-        category: data.category,
-        merchantName: data.merchantName,
-      };
-    } catch (parseError) {
-      console.error("Error parsing JSON response:", parseError);
-      throw new Error("Invalid response format from Gemini");
+    const data = JSON.parse(cleanedText);
+
+    let category = normalizeCategory(data.category);
+
+    // fallback if weak prediction
+    if (category === "other-expense") {
+      category = fallbackCategory(data.description);
     }
+
+    return {
+      amount: parseFloat(data.amount),
+      date: new Date(data.date),
+      description: data.description,
+      category,
+      merchantName: data.merchantName,
+    };
   } catch (error) {
     console.error("Error scanning receipt:", error);
     throw new Error("Failed to scan receipt");
   }
 }
 
-// Helper function to calculate next recurring date
+// Helper
 function calculateNextRecurringDate(startDate, interval) {
   const date = new Date(startDate);
 

@@ -41,7 +41,6 @@ export function AddTransactionForm({
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
 
-  // Professional Indian Currency Formatter for the account dropdown
   const formatINR = (amount) =>
     new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -78,6 +77,7 @@ export function AddTransactionForm({
             amount: "",
             description: "",
             accountId: accounts.find((ac) => ac.isDefault)?.id,
+            category: "",
             date: new Date(),
             isRecurring: false,
           },
@@ -102,16 +102,23 @@ export function AddTransactionForm({
     }
   };
 
+  // ✅ FIXED SCAN HANDLER
   const handleScanComplete = (scannedData) => {
     if (scannedData) {
       setValue("amount", scannedData.amount.toString());
       setValue("date", new Date(scannedData.date));
+
       if (scannedData.description) {
         setValue("description", scannedData.description);
       }
+
       if (scannedData.category) {
-        setValue("category", scannedData.category);
+        setValue("category", scannedData.category.toLowerCase(), {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
       }
+
       toast.success("Receipt scanned successfully");
     }
   };
@@ -144,8 +151,8 @@ export function AddTransactionForm({
       <div className="space-y-2">
         <label className="text-sm font-medium">Type</label>
         <Select
+          value={type}
           onValueChange={(value) => setValue("type", value)}
-          defaultValue={type}
         >
           <SelectTrigger className="bg-background">
             <SelectValue placeholder="Select type" />
@@ -155,12 +162,9 @@ export function AddTransactionForm({
             <SelectItem value="INCOME">Income</SelectItem>
           </SelectContent>
         </Select>
-        {errors.type && (
-          <p className="text-sm text-red-500">{errors.type.message}</p>
-        )}
       </div>
 
-      {/* Amount and Account */}
+      {/* Amount + Account */}
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
           <label className="text-sm font-medium">Amount</label>
@@ -176,16 +180,13 @@ export function AddTransactionForm({
               {...register("amount")}
             />
           </div>
-          {errors.amount && (
-            <p className="text-sm text-red-500">{errors.amount.message}</p>
-          )}
         </div>
 
         <div className="space-y-2">
           <label className="text-sm font-medium">Account</label>
           <Select
+            value={watch("accountId")}
             onValueChange={(value) => setValue("accountId", value)}
-            defaultValue={getValues("accountId")}
           >
             <SelectTrigger className="bg-background">
               <SelectValue placeholder="Select account" />
@@ -197,42 +198,40 @@ export function AddTransactionForm({
                 </SelectItem>
               ))}
               <CreateAccountDrawer>
-                <Button
-                  variant="ghost"
-                  className="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-                >
-                  Create Account
-                </Button>
+                <Button className="w-full">Create Account</Button>
               </CreateAccountDrawer>
             </SelectContent>
           </Select>
-          {errors.accountId && (
-            <p className="text-sm text-red-500">{errors.accountId.message}</p>
-          )}
         </div>
       </div>
 
-      {/* Category */}
+      {/* ✅ FIXED CATEGORY */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Category</label>
         <Select
-          onValueChange={(value) => setValue("category", value)}
-          defaultValue={getValues("category")}
+          value={watch("category")}
+          onValueChange={(value) =>
+            setValue("category", value, {
+              shouldValidate: true,
+              shouldDirty: true,
+            })
+          }
         >
           <SelectTrigger className="bg-background">
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
+
           <SelectContent>
             {filteredCategories.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
+              <SelectItem
+                key={category.id}
+                value={category.name.toLowerCase()}
+              >
                 {category.name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        {errors.category && (
-          <p className="text-sm text-red-500">{errors.category.message}</p>
-        )}
       </div>
 
       {/* Date */}
@@ -240,104 +239,31 @@ export function AddTransactionForm({
         <label className="text-sm font-medium">Date</label>
         <Popover>
           <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full pl-3 text-left font-normal bg-background",
-                !date && "text-muted-foreground"
-              )}
-            >
-              {date ? format(date, "PPP") : <span>Pick a date</span>}
-              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+            <Button variant="outline" className="w-full">
+              {date ? format(date, "PPP") : "Pick a date"}
+              <CalendarIcon className="ml-auto h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent>
             <Calendar
               mode="single"
               selected={date}
               onSelect={(date) => setValue("date", date)}
-              disabled={(date) =>
-                date > new Date() || date < new Date("1900-01-01")
-              }
-              initialFocus
             />
           </PopoverContent>
         </Popover>
-        {errors.date && (
-          <p className="text-sm text-red-500">{errors.date.message}</p>
-        )}
       </div>
 
       {/* Description */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">Description</label>
-        <Input placeholder="Enter description" {...register("description")} />
-        {errors.description && (
-          <p className="text-sm text-red-500">{errors.description.message}</p>
-        )}
+        <label>Description</label>
+        <Input {...register("description")} />
       </div>
-
-      {/* Recurring Toggle */}
-      <div className="flex flex-row items-center justify-between rounded-lg border p-4 bg-background/50">
-        <div className="space-y-0.5">
-          <label className="text-base font-medium">Recurring Transaction</label>
-          <div className="text-sm text-muted-foreground">
-            Set up a recurring schedule for this transaction
-          </div>
-        </div>
-        <Switch
-          checked={isRecurring}
-          onCheckedChange={(checked) => setValue("isRecurring", checked)}
-        />
-      </div>
-
-      {/* Recurring Interval */}
-      {isRecurring && (
-        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-          <label className="text-sm font-medium">Recurring Interval</label>
-          <Select
-            onValueChange={(value) => setValue("recurringInterval", value)}
-            defaultValue={getValues("recurringInterval")}
-          >
-            <SelectTrigger className="bg-background">
-              <SelectValue placeholder="Select interval" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="DAILY">Daily</SelectItem>
-              <SelectItem value="WEEKLY">Weekly</SelectItem>
-              <SelectItem value="MONTHLY">Monthly</SelectItem>
-              <SelectItem value="YEARLY">Yearly</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.recurringInterval && (
-            <p className="text-sm text-red-500">
-              {errors.recurringInterval.message}
-            </p>
-          )}
-        </div>
-      )}
 
       {/* Actions */}
       <div className="flex gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={() => router.back()}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" className="w-full" disabled={transactionLoading}>
-          {transactionLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {editMode ? "Updating..." : "Creating..."}
-            </>
-          ) : editMode ? (
-            "Update Transaction"
-          ) : (
-            "Create Transaction"
-          )}
+        <Button type="submit" className="w-full">
+          {transactionLoading ? <Loader2 /> : "Create Transaction"}
         </Button>
       </div>
     </form>

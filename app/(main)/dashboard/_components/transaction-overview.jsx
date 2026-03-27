@@ -37,13 +37,15 @@ export function DashboardOverview({ accounts, transactions }) {
     accounts.find((a) => a.isDefault)?.id || accounts[0]?.id
   );
 
-  // Professional Indian Currency Formatter
-  const formatINR = (amount) =>
-    new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
+  // Bulletproof Rupee Formatter - Forces the ₹ symbol manually
+  const formatINR = (amount) => {
+    const formattedAmount = new Intl.NumberFormat("en-IN", {
       minimumFractionDigits: 2,
-    }).format(amount);
+      maximumFractionDigits: 2,
+    }).format(Math.abs(amount));
+    
+    return `₹${formattedAmount}`;
+  };
 
   const accountTransactions = transactions.filter(
     (t) => t.accountId === selectedAccountId
@@ -167,7 +169,7 @@ export function DashboardOverview({ accounts, transactions }) {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value) => formatINR(value)}
+                    formatter={(value) => formatINR(Number(value))}
                     contentStyle={{
                       backgroundColor: "#0f172a",
                       border: "1px solid rgba(255,255,255,0.1)",

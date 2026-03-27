@@ -76,11 +76,9 @@ export function TransactionTable({ transactions }) {
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
-  // Memoized filtered and sorted transactions
   const filteredAndSortedTransactions = useMemo(() => {
     let result = [...transactions];
 
-    // Apply search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       result = result.filter((transaction) =>
@@ -88,12 +86,10 @@ export function TransactionTable({ transactions }) {
       );
     }
 
-    // Apply type filter
     if (typeFilter) {
       result = result.filter((transaction) => transaction.type === typeFilter);
     }
 
-    // Apply recurring filter
     if (recurringFilter) {
       result = result.filter((transaction) => {
         if (recurringFilter === "recurring") return transaction.isRecurring;
@@ -101,10 +97,8 @@ export function TransactionTable({ transactions }) {
       });
     }
 
-    // Apply sorting
     result.sort((a, b) => {
       let comparison = 0;
-
       switch (sortConfig.field) {
         case "date":
           comparison = new Date(a.date) - new Date(b.date);
@@ -118,14 +112,12 @@ export function TransactionTable({ transactions }) {
         default:
           comparison = 0;
       }
-
       return sortConfig.direction === "asc" ? comparison : -comparison;
     });
 
     return result;
   }, [transactions, searchTerm, typeFilter, recurringFilter, sortConfig]);
 
-  // Pagination calculations
   const totalPages = Math.ceil(
     filteredAndSortedTransactions.length / ITEMS_PER_PAGE
   );
@@ -193,7 +185,7 @@ export function TransactionTable({ transactions }) {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    setSelectedIds([]); // Clear selections on page change
+    setSelectedIds([]); 
   };
 
   return (
@@ -201,7 +193,7 @@ export function TransactionTable({ transactions }) {
       {deleteLoading && (
         <BarLoader className="mt-4" width={"100%"} color="#9333ea" />
       )}
-      {/* Filters */}
+      
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -248,7 +240,6 @@ export function TransactionTable({ transactions }) {
             </SelectContent>
           </Select>
 
-          {/* Bulk Actions */}
           {selectedIds.length > 0 && (
             <div className="flex items-center gap-2">
               <Button
@@ -275,7 +266,6 @@ export function TransactionTable({ transactions }) {
         </div>
       </div>
 
-      {/* Transactions Table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -377,8 +367,13 @@ export function TransactionTable({ transactions }) {
                         : "text-green-500"
                     )}
                   >
-                    {transaction.type === "EXPENSE" ? "-" : "+"}$
-                    {transaction.amount.toFixed(2)}
+                    {/* Fixed Currency formatting here */}
+                    {transaction.type === "EXPENSE" ? "-" : "+"}
+                    {new Intl.NumberFormat("en-IN", { 
+                        style: "currency",
+                        currency: "INR",
+                        minimumFractionDigits: 2, 
+                    }).format(transaction.amount)}
                   </TableCell>
                   <TableCell>
                     {transaction.isRecurring ? (
@@ -390,11 +385,7 @@ export function TransactionTable({ transactions }) {
                               className="gap-1 bg-purple-100 text-purple-700 hover:bg-purple-200"
                             >
                               <RefreshCw className="h-3 w-3" />
-                              {
-                                RECURRING_INTERVALS[
-                                  transaction.recurringInterval
-                                ]
-                              }
+                              {RECURRING_INTERVALS[transaction.recurringInterval]}
                             </Badge>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -420,12 +411,16 @@ export function TransactionTable({ transactions }) {
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent 
+                        align="end" 
+                        className="bg-slate-700 border-slate-600 shadow-xl min-w-[120px]"
+                      >
                         <DropdownMenuItem
+                          className="text-white cursor-pointer hover:bg-slate-600 focus:bg-slate-600 focus:text-white transition-colors"
                           onClick={() =>
                             router.push(
                               `/transaction/create?edit=${transaction.id}`
@@ -434,9 +429,9 @@ export function TransactionTable({ transactions }) {
                         >
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator className="bg-slate-600" />
                         <DropdownMenuItem
-                          className="text-destructive"
+                          className="text-red-400 cursor-pointer hover:bg-red-900/30 focus:bg-red-900/30 focus:text-red-300 transition-colors"
                           onClick={() => deleteFn([transaction.id])}
                         >
                           Delete
@@ -451,7 +446,6 @@ export function TransactionTable({ transactions }) {
         </Table>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2">
           <Button

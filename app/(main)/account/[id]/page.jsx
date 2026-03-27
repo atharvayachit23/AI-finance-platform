@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { AccountChart } from "../_components/account-chart";
 
 export default async function AccountPage({ params }) {
-  const { id } = await params; // Await the params promise
+  const { id } = await params;
   const accountData = await getAccountWithTransactions(id);
 
   if (!accountData) {
@@ -14,6 +14,14 @@ export default async function AccountPage({ params }) {
   }
 
   const { transactions, ...account } = accountData;
+
+  // Rupee Formatter helper for this page
+  const formatINR = (amount) => {
+    return "₹" + new Intl.NumberFormat("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
   return (
     <div className="space-y-8 px-5">
@@ -30,7 +38,7 @@ export default async function AccountPage({ params }) {
 
         <div className="text-right pb-2">
           <div className="text-xl sm:text-2xl font-bold">
-            ${parseFloat(account.balance).toFixed(2)}
+            {formatINR(parseFloat(account.balance))}
           </div>
           <p className="text-sm text-muted-foreground">
             {account._count.transactions} Transactions
@@ -38,14 +46,12 @@ export default async function AccountPage({ params }) {
         </div>
       </div>
 
-      {/* Chart Section */}
       <Suspense
         fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}
       >
         <AccountChart transactions={transactions} />
       </Suspense>
 
-      {/* Transactions Table */}
       <Suspense
         fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}
       >

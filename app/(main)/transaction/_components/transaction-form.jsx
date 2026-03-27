@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, Loader2, IndianRupee, Zap } from "lucide-react";
+import { CalendarIcon, Loader2, IndianRupee, Zap, RefreshCw } from "lucide-react";
 import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { createTransaction, updateTransaction } from "@/actions/transaction";
 import { transactionSchema } from "@/app/lib/schema";
 import { ReceiptScanner } from "./recipt-scanner";
+import { Switch } from "@/components/ui/switch"; // Ensure you have this UI component
 
 export function AddTransactionForm({
   accounts,
@@ -136,6 +137,7 @@ export function AddTransactionForm({
   const date = watch("date");
   const accountId = watch("accountId");
   const category = watch("category");
+  const isRecurring = watch("isRecurring");
 
   const filteredCategories = categories.filter((cat) => cat.type === type);
 
@@ -173,11 +175,11 @@ export function AddTransactionForm({
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary">
               <IndianRupee className="h-4 w-4" />
             </div>
-            <Input
+            <input
               type="number"
               step="0.01"
               placeholder="0.00"
-              className="h-12 pl-12 bg-white/5 border-white/10 rounded-xl focus:border-primary/50 transition-all font-mono"
+              className="flex h-12 w-full pl-12 bg-white/5 border border-white/10 rounded-xl focus:border-primary/50 transition-all font-mono outline-none text-white px-3"
               {...register("amount")}
             />
           </div>
@@ -251,6 +253,48 @@ export function AddTransactionForm({
           className="h-12 bg-white/5 border-white/10 rounded-xl"
           {...register("description")} 
         />
+      </div>
+
+      {/* Recurring Transaction Toggle */}
+      <div className="p-4 border border-white/10 rounded-2xl bg-white/5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+              <RefreshCw className={cn("h-3 w-3", isRecurring && "animate-spin-slow")} />
+              Recurring_Protocol
+            </label>
+            <p className="text-xs text-slate-500 font-medium">Auto-generate entries on schedule</p>
+          </div>
+          <Switch
+            checked={isRecurring}
+            onCheckedChange={(checked) => setValue("isRecurring", checked)}
+          />
+        </div>
+
+        {isRecurring && (
+          <div className="grid gap-4 md:grid-cols-1 pt-2 animate-in fade-in slide-in-from-top-2">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sync_Interval</label>
+              <Select
+                value={watch("recurringInterval")}
+                onValueChange={(value) => setValue("recurringInterval", value)}
+              >
+                <SelectTrigger className="h-10 bg-neutral-900 border-white/10 rounded-lg">
+                  <SelectValue placeholder="Select interval" />
+                </SelectTrigger>
+                <SelectContent className="bg-neutral-900 border-neutral-800">
+                  <SelectItem value="DAILY">Daily</SelectItem>
+                  <SelectItem value="WEEKLY">Weekly</SelectItem>
+                  <SelectItem value="MONTHLY">Monthly</SelectItem>
+                  <SelectItem value="YEARLY">Yearly</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.recurringInterval && (
+                <p className="text-[10px] text-red-500 font-bold uppercase">{errors.recurringInterval.message}</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <Button 

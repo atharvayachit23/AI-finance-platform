@@ -60,12 +60,12 @@ const HeroSection = () => {
         <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-24">
           <Link href="/dashboard" className="w-full sm:w-auto">
             <Button size="lg" className="w-full h-16 px-10 rounded-full bg-primary text-black font-black hover:bg-emerald-400 shadow-glow hover:scale-105 transition-all border-none group">
-              ACCESS_TERMINAL <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              DASHBOARD <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
           <Link href="#features" className="w-full sm:w-auto">
             <Button variant="outline" size="lg" className="w-full h-16 px-10 rounded-full border-white/10 bg-white/5 text-white hover:bg-white/10 transition-all font-bold">
-              SYSTEM_PROTOCOL
+              FEATURES
             </Button>
           </Link>
         </div>

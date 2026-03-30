@@ -18,7 +18,12 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <head>
           <link rel="icon" href="/logo-sm.png" sizes="any" />
+
+          {/* ✅ PWA CONFIG */}
+          <link rel="manifest" href="/manifest.json" />
+          <meta name="theme-color" content="#000000" />
         </head>
+
         <body className={cn(inter.className, "bg-[#050505] text-slate-200 antialiased overflow-x-hidden relative w-full")}>
           <Header />
           <main className="min-h-screen w-full">
@@ -26,7 +31,6 @@ export default function RootLayout({ children }) {
           </main>
           <Toaster richColors />
 
-          {/* Obsidian Footer Overhaul */}
           <footer className="border-t border-white/5 bg-black/40 backdrop-blur-md py-12 w-full">
             <div className="container mx-auto px-4">
               <div className="flex flex-col items-center justify-center space-y-4 text-center">

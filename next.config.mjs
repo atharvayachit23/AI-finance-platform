@@ -1,4 +1,12 @@
 /** @type {import('next').NextConfig} */
+
+import withPWAInit from "next-pwa";
+
+const withPWA = withPWAInit({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+});
+
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -15,13 +23,13 @@ const nextConfig = {
     },
   },
 
-  // ADD THESE TWO BLOCKS BELOW TO BYPASS THE ERRORS
   eslint: {
     ignoreDuringBuilds: true,
   },
+
   typescript: {
     ignoreBuildErrors: true,
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);

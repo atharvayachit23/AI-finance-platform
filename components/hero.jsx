@@ -48,7 +48,7 @@ const HeroSection = () => {
         <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-[115px] font-black tracking-tighter text-white mb-8 uppercase italic leading-[0.85] break-words">
           Manage <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-primary to-emerald-400">
-            Intelligence
+            Finance 
           </span>
         </h1>
 

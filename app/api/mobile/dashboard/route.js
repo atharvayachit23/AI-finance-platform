@@ -1,11 +1,10 @@
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-// 1. Corrected path based on your file location
 import { db } from "@/lib/prisma"; 
  
 export async function GET(req: NextRequest) {
   try {
-    // 2. Extract userId from the mobile Bearer Token
+    // 1. Extract userId from the mobile Bearer Token
     const { userId } = getAuth(req);
 
     if (!userId) {
@@ -13,8 +12,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
 
-    // 3. Directly query Prisma to bypass Web-Action cookie issues
-    const [accounts, transactions] = await Promise.all([
+    // 2. Setup date boundary for the current month's budget tracking (Matches Inngest logic)
+    const currentMonthStart = new Date();
+    currentMonthStart.setDate(1);
+    currentMonthStart.setHours(0, 0, 0, 0);
+
+    // 3. Fetch accounts, recent transactions, actual budget, and true monthly expense sum in parallel
+    const [accounts, transactions, activeBudget, monthlyExpensesAggregation] = await Promise.all([
       db.account.findMany({
         where: { userId },
         orderBy: { createdAt: "asc" },
@@ -22,23 +26,35 @@ export async function GET(req: NextRequest) {
       db.transaction.findMany({
         where: { userId },
         orderBy: { date: "desc" },
-        take: 10,
+        take: 10, // Keep this small for fast mobile network payloads
+      }),
+      db.budget.findFirst({
+        where: { userId },
+      }),
+      db.transaction.aggregate({
+        where: {
+          userId,
+          type: "EXPENSE",
+          date: { gte: currentMonthStart },
+        },
+        _sum: {
+          amount: true,
+        },
       }),
     ]);
 
-    // 4. Calculate real-time budget telemetry for the mobile UI
     const defaultAccount = accounts.find((acc: any) => acc.isDefault);
     
-    const currentExpenses = transactions
-      .filter((t: any) => t.type === "EXPENSE")
-      .reduce((sum: number, t: any) => sum + Number(t.amount), 0);
+    // Get the true comprehensive monthly sum, defaulting to 0 if no transactions exist yet
+    const trueMonthlyExpenses = monthlyExpensesAggregation._sum.amount?.toNumber() || 0;
 
     return NextResponse.json({ 
       accounts, 
       transactions,
-      budgetData: defaultAccount ? {
-        amount: 60000, // Replace with your 'budgets' table query if applicable
-        currentExpenses
+      budgetData: activeBudget ? {
+        amount: activeBudget.amount, // Real budget limit from database instead of hardcoded 60000
+        currentExpenses: trueMonthlyExpenses, // True month-to-date calculation matching Inngest
+        percentageUsed: (trueMonthlyExpenses / activeBudget.amount) * 100
       } : null
     });
 

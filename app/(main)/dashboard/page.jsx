@@ -5,10 +5,11 @@ import { AccountCard } from "./_components/account-card";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { BudgetProgress } from "./_components/budget-progress";
 import { DashboardOverview } from "./_components/transaction-overview";
-import { CardContent } from "@/components/ui/card";
-import { Plus, LayoutGrid, Activity, Wallet } from "lucide-react";
+import { GenerateReportCard } from "./_components/generate-report-card";
+import { Plus, Activity, Wallet, ShieldCheck, Zap } from "lucide-react";
 
 export default async function DashboardPage() {
+  // Fetch real database records securely on the server
   const [accounts, transactions] = await Promise.all([
     getUserAccounts(),
     getDashboardData(),
@@ -22,31 +23,41 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="space-y-10 pb-20">
-      {/* Header Section - Gives it a "Custom App" feel */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-8">
+    <div className="relative min-h-screen bg-black text-white px-4 sm:px-6 md:px-8 py-6 pb-20 select-none overflow-x-hidden">
+      
+      {/* Background Soft Global Lighting Spot for Premium PWA Vibe */}
+      <div className="absolute top-10 left-1/4 h-80 w-80 rounded-full bg-emerald-500/[0.03] blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-emerald-400/[0.02] blur-[150px] pointer-events-none" />
+
+      {/* Header System Panel */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-900 pb-6 mb-8 relative z-10">
         <div>
-          <h1 className="text-4xl font-black tracking-tighter text-white uppercase italic">
-            Terminal<span className="text-primary">_</span>Insights
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tighter uppercase italic flex items-center gap-2">
+            TERMINAL<span className="text-emerald-400">_</span>INSIGHTS
           </h1>
-          <p className="text-slate-500 font-medium mt-1">Real-time financial telemetry and asset tracking.</p>
+          <p className="text-slate-500 text-xs sm:text-sm font-semibold mt-1">
+            Secure, encrypted real-time financial telemetry dashboard.
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex flex-col items-end">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">System Status</span>
-            <span className="text-xs text-slate-300 flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" /> Live Encrypted
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <div className="flex flex-col items-start sm:items-end bg-neutral-950/40 border border-neutral-900 px-3 py-1.5 rounded-xl">
+            <span className="text-[9px] uppercase tracking-[0.15em] text-emerald-400 font-bold flex items-center gap-1.5">
+              <Zap size={10} className="animate-pulse text-emerald-400" /> SYSTEM_ONLINE
+            </span>
+            <span className="text-[11px] text-neutral-400 font-mono flex items-center gap-1.5 mt-0.5">
+              <ShieldCheck size={12} className="text-emerald-500" /> Secure Encryption Mode
             </span>
           </div>
         </div>
       </div>
 
-      {/* Main Pulse Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Budget & Analytics */}
-        <div className="lg:col-span-8 space-y-8">
-          <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-primary/5 p-1">
-             <div className="glass-card rounded-[1.4rem] p-2">
+      {/* Main Column Framework Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+        
+        {/* Left Hand Block: Budget status and Transaction flow logs */}
+        <div className="lg:col-span-8 space-y-6">
+          <section className="relative overflow-hidden rounded-2xl border border-emerald-500/10 bg-emerald-500/[0.02] p-0.5">
+             <div className="bg-neutral-950/80 rounded-[1.35rem] backdrop-blur-md">
                 <BudgetProgress
                   initialBudget={budgetData?.budget}
                   currentExpenses={budgetData?.currentExpenses || 0}
@@ -54,10 +65,10 @@ export default async function DashboardPage() {
              </div>
           </section>
 
-          <section className="glass-card rounded-3xl p-6">
-            <div className="flex items-center gap-2 mb-6 text-slate-400">
-               <Activity size={18} className="text-primary" />
-               <span className="text-sm font-bold uppercase tracking-widest">Market_Flow</span>
+          <section className="bg-neutral-950/40 border border-neutral-900 rounded-2xl p-4 sm:p-6 backdrop-blur-md">
+            <div className="flex items-center gap-2 mb-5 text-neutral-400">
+               <Activity size={16} className="text-emerald-400" />
+               <span className="text-xs sm:text-sm font-bold uppercase tracking-widest font-mono">FLOW_METRIC_TELEMETRY</span>
             </div>
             <DashboardOverview
               accounts={accounts}
@@ -66,32 +77,44 @@ export default async function DashboardPage() {
           </section>
         </div>
 
-        {/* Right Column: Accounts & Actions */}
+        {/* Right Hand Block: AI Report widget, account controls & vaults list */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="flex items-center justify-between px-2">
-             <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
-               <Wallet size={16} /> Asset_Vaults
+          
+          {/* Dashboard AI Report Generator Component */}
+          <GenerateReportCard />
+
+          {/* Section Heading */}
+          <div className="flex items-center justify-between px-1 mt-2">
+             <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2 font-mono">
+               <Wallet size={15} /> ASSET_CONTAINERS
              </h2>
-             <span className="text-[10px] text-primary font-mono bg-primary/10 px-2 py-0.5 rounded">{accounts.length} ACTIVE</span>
+             <span className="text-[9px] text-emerald-400 font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+               {accounts?.length || 0} ONLINE
+             </span>
           </div>
 
-          <div className="grid gap-4">
-            {/* Create Account Action */}
+          <div className="grid gap-3.5">
+            {/* Create Account Action Trigger */}
             <CreateAccountDrawer>
-              <div className="group relative cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed border-white/10 p-6 transition-all hover:border-primary/50 hover:bg-primary/5">
-                <div className="flex flex-col items-center justify-center text-slate-500 group-hover:text-primary transition-colors">
-                  <Plus className="h-8 w-8 mb-2 transition-transform group-hover:rotate-90" />
-                  <p className="text-xs font-bold uppercase tracking-tighter">Initialize New Vault</p>
+              <div className="group relative cursor-pointer overflow-hidden rounded-2xl border border-dashed border-neutral-800 p-5 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/[0.02] active:scale-[0.98] touch-manipulation">
+                <div className="flex flex-col items-center justify-center text-neutral-500 group-hover:text-emerald-400 transition-colors">
+                  <Plus className="h-6 w-6 mb-1.5 transition-transform group-hover:rotate-90 duration-300" />
+                  <p className="text-[10px] font-bold uppercase font-mono tracking-wider">Initialize Container</p>
                 </div>
               </div>
             </CreateAccountDrawer>
 
             {/* List existing accounts */}
-            <div className="space-y-4">
-              {accounts.length > 0 &&
-                accounts?.map((account) => (
+            <div className="space-y-3">
+              {accounts && accounts.length > 0 ? (
+                accounts.map((account) => (
                   <AccountCard key={account.id} account={account} />
-                ))}
+                ))
+              ) : (
+                <div className="p-8 text-center rounded-2xl border border-neutral-900 bg-neutral-950/40 text-neutral-500 text-xs font-mono">
+                  NO_CONTAINERS_INITIALIZED
+                </div>
+              )}
             </div>
           </div>
         </div>

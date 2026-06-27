@@ -17,6 +17,7 @@
     "@capacitor/core": "^8.3.0",
     "@capacitor/splash-screen": "^8.0.1",
     "@clerk/nextjs": "^6.6.0",
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@google/generative-ai": "^0.21.0",
     "@hookform/resolvers": "^3.9.1",
     "@prisma/client": "^5.22.0",

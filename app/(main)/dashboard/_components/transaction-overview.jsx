@@ -79,6 +79,33 @@ export function DashboardOverview({ accounts, transactions }) {
     })
   );
 
+  // Custom label renderer to position text dynamically closer to prevent clipping.
+  // It handles left/right text anchoring cleanly and formats the currency with ₹.
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, name, value }) => {
+    const RADIAN = Math.PI / 180;
+    // Position labels slightly outside the outer radius
+    const radius = outerRadius + 12;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    const textAnchor = x > cx ? "start" : "end";
+
+    // Truncate category names if they are exceptionally long to protect smaller viewports
+    const displayName = name.length > 12 ? `${name.slice(0, 10)}..` : name;
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#94a3b8" // slate-400 to match the dark terminal styling
+        textAnchor={textAnchor}
+        dominantBaseline="central"
+        className="text-[9px] font-black font-mono tracking-wider uppercase"
+      >
+        {`${displayName}: ${formatINR(value)}`}
+      </text>
+    );
+  };
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {/* Recent Transactions Card */}
@@ -151,18 +178,22 @@ export function DashboardOverview({ accounts, transactions }) {
           ) : (
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+                <PieChart margin={{ top: 20, right: 50, bottom: 20, left: 50 }}>
                   <Pie
                     data={pieChartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
+                    innerRadius={50} // Slightly reduced from 60 to prevent outer boundary collisions
+                    outerRadius={70} // Slightly reduced from 80 to reserve 10px additional safe padding
                     paddingAngle={5}
                     dataKey="value"
                     stroke="none"
-                    label={({ name, value }) => `${name}: ${formatINR(value)}`}
-                    labelLine={false}
+                    label={renderCustomizedLabel}
+                    labelLine={{
+                      stroke: "rgba(255, 255, 255, 0.1)",
+                      strokeWidth: 1,
+                      strokeDasharray: "2 2",
+                    }}
                   >
                     {pieChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} className="hover:opacity-80 transition-opacity cursor-pointer" />

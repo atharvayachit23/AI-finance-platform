@@ -72,7 +72,7 @@ export function AccountCard({ account }) {
             }).format(parseFloat(balance))}
           </div>
           <p className="text-[10px] uppercase tracking-widest text-primary font-bold mt-1">
-            {type.charAt(0) + type.slice(1).toLowerCase()} Vault
+            {type.charAt(0) + type.slice(1).toLowerCase()} Account
           </p>
         </CardContent>
         <CardFooter className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 border-t border-white/5 pt-4 mt-2">

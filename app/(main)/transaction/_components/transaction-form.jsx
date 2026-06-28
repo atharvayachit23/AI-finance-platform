@@ -170,7 +170,7 @@ export function AddTransactionForm({
       {/* Amount & Account */}
       <div className="grid gap-6 md:grid-cols-2 w-full">
         <div className="space-y-2 min-w-0">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Amount_Telemetry</label>
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Amount</label>
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary">
               <IndianRupee className="h-4 w-4" />
@@ -187,7 +187,7 @@ export function AddTransactionForm({
         </div>
 
         <div className="space-y-2 min-w-0">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Source_Account</label>
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Account</label>
           <Select value={accountId} onValueChange={(value) => setValue("accountId", value)}>
             <SelectTrigger className="h-12 bg-white/5 border-white/10 rounded-xl w-full">
               <SelectValue placeholder="Select account" />
@@ -211,7 +211,7 @@ export function AddTransactionForm({
       {/* Category & Date */}
       <div className="grid gap-6 md:grid-cols-2 w-full">
         <div className="space-y-2 min-w-0">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Data_Category</label>
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Category</label>
           <Select
             value={category}
             onValueChange={(value) => setValue("category", value, { shouldValidate: true })}
@@ -231,7 +231,7 @@ export function AddTransactionForm({
         </div>
 
         <div className="space-y-2 min-w-0">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Entry_Timestamp</label>
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Date</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="h-12 w-full bg-white/5 border-white/10 rounded-xl justify-start px-4">
@@ -248,7 +248,7 @@ export function AddTransactionForm({
 
       {/* Description */}
       <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Telemetry_Description</label>
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Description</label>
         <Input 
           className="h-12 bg-white/5 border-white/10 rounded-xl"
           {...register("description")} 
@@ -261,7 +261,7 @@ export function AddTransactionForm({
           <div className="space-y-0.5">
             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
               <RefreshCw className={cn("h-3 w-3", isRecurring && "animate-spin-slow")} />
-              Recurring_Protocol
+              Recurring_Transaction
             </label>
             <p className="text-xs text-slate-500 font-medium">Auto-generate entries on schedule</p>
           </div>

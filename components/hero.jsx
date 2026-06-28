@@ -56,9 +56,10 @@ const HeroSection = () => {
         </h1>
 
         <p className="text-base md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
-          The definitive financial telemetry platform. Elevate your capital management with 
-          <span className="text-white"> Welth</span>—precision tracking meets AI-driven insights.
-        </p>
+            Your personal finance companion. Track spending, manage budgets, and make
+            better financial decisions with{" "}
+            <span className="text-white">Welth's AI-powered insights.</span>
+          </p>
 
         <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-24">
           <a href="/dashboard" className="w-full sm:w-auto">

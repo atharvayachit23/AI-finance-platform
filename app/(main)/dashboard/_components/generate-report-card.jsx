@@ -81,13 +81,13 @@ export function GenerateReportCard() {
       </div>
       
       <p className="mt-2 text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans relative z-10">
-        Generate standard telemetry reports directly into your verified email.
+        Generate standard reports directly into your verified email.
       </p>
 
       {/* Dropdown container */}
       <div className="relative mt-5 z-20" ref={dropdownRef}>
         <span className="block text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-500 mb-1.5">
-          TIME_HORIZON
+          TIME_Period
         </span>
         <button
           type="button"
@@ -135,12 +135,12 @@ export function GenerateReportCard() {
           {loading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin text-neutral-950" />
-              <span>DISPATCHING_PIPELINE...</span>
+              <span>DISPATCHING_REPORT...</span>
             </>
           ) : (
             <>
               <Mail className="h-4 w-4 text-neutral-950" />
-              <span>COMPILE_REPORT</span>
+              <span>GENERATE_REPORT</span>
             </>
           )}
         </button>
@@ -151,7 +151,7 @@ export function GenerateReportCard() {
           <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
           <div>
             <p className="font-bold text-emerald-200">PIPELINE_SUCCESSFUL</p>
-            <p className="text-neutral-400 text-[11px] mt-0.5">Telemetry report is routed to your system register email.</p>
+            <p className="text-neutral-400 text-[11px] mt-0.5">Financial report is routed to your system register email.</p>
           </div>
         </div>
       )}

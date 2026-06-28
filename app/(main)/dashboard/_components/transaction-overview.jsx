@@ -113,7 +113,7 @@ export function DashboardOverview({ accounts, transactions }) {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-2">
             <Zap className="h-3 w-3 text-primary fill-current" />
-            LIVE_LEDGER
+            Recent Transactions
           </CardTitle>
           <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
             <SelectTrigger className="w-[160px] bg-white/5 border-white/10 text-xs font-bold uppercase tracking-wider h-8 rounded-xl">
@@ -132,7 +132,7 @@ export function DashboardOverview({ accounts, transactions }) {
           <div className="space-y-4">
             {recentTransactions.length === 0 ? (
               <p className="text-center text-[10px] font-bold uppercase tracking-widest text-slate-500 py-8 italic">
-                No telemetry recorded
+                No transactions recorded
               </p>
             ) : (
               recentTransactions.map((transaction) => (
@@ -167,13 +167,13 @@ export function DashboardOverview({ accounts, transactions }) {
       <Card className="border-white/10 bg-black/20 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
-            SECTOR_DISTRIBUTION
+            EXPENSE_BREAKDOWN
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0 pb-5">
           {pieChartData.length === 0 ? (
             <p className="text-center text-[10px] font-bold uppercase tracking-widest text-slate-500 py-8 italic">
-              Awaiting fiscal data
+              Awaiting data
             </p>
           ) : (
             <div className="h-[300px] w-full">
@@ -221,3 +221,5 @@ export function DashboardOverview({ accounts, transactions }) {
     </div>
   );
 }
+
+

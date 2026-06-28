@@ -109,6 +109,16 @@ export async function createTransaction(data) {
 
     if (!account) throw new Error("Account not found");
 
+    // Prevent spending more than the available balance
+    if (
+      data.type === "EXPENSE" &&
+      data.amount > account.balance.toNumber()
+    ) {
+      throw new Error(
+        `INSUFFICIENT_BALANCE|${account.balance.toNumber()}`
+      );
+    }
+
     const balanceChange =
       data.type === "EXPENSE" ? -data.amount : data.amount;
 

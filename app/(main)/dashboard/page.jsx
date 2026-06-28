@@ -36,7 +36,7 @@ export default async function DashboardPage() {
             TERMINAL<span className="text-emerald-400">_</span>INSIGHTS
           </h1>
           <p className="text-slate-500 text-xs sm:text-sm font-semibold mt-1">
-            Secure, encrypted real-time financial telemetry dashboard.
+            Secure and encrypted real-time  dashboard.
           </p>
         </div>
         <div className="flex items-center gap-3 self-start sm:self-auto">
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
           {/* Section Heading */}
           <div className="flex items-center justify-between px-1 mt-2">
              <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2 font-mono">
-               <Wallet size={15} /> ASSET_CONTAINERS
+               <Wallet size={15} /> Accounts
              </h2>
              <span className="text-[9px] text-emerald-400 font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
                {accounts?.length || 0} ONLINE
@@ -99,7 +99,7 @@ export default async function DashboardPage() {
               <div className="group relative cursor-pointer overflow-hidden rounded-2xl border border-dashed border-neutral-800 p-5 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/[0.02] active:scale-[0.98] touch-manipulation">
                 <div className="flex flex-col items-center justify-center text-neutral-500 group-hover:text-emerald-400 transition-colors">
                   <Plus className="h-6 w-6 mb-1.5 transition-transform group-hover:rotate-90 duration-300" />
-                  <p className="text-[10px] font-bold uppercase font-mono tracking-wider">Initialize Container</p>
+                  <p className="text-[10px] font-bold uppercase font-mono tracking-wider">Initialize new Account</p>
                 </div>
               </div>
             </CreateAccountDrawer>
@@ -112,7 +112,7 @@ export default async function DashboardPage() {
                 ))
               ) : (
                 <div className="p-8 text-center rounded-2xl border border-neutral-900 bg-neutral-950/40 text-neutral-500 text-xs font-mono">
-                  NO_CONTAINERS_INITIALIZED
+                  NO_ACCOUNTS
                 </div>
               )}
             </div>

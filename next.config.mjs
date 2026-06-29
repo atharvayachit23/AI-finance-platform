@@ -1,12 +1,11 @@
 /** @type {import('next').NextConfig} */
-
-import withPWAInit from "next-pwa";
+import withPWAInit from "@ducanh2912/next-pwa"; // Upgraded to modern wrapper
 
 const withPWA = withPWAInit({
   dest: "public",
   register: true,
   skipWaiting: true,
-  disable: false, // ✅ FORCE ENABLE (important)
+  disable: false, // ✅ FORCE ENABLE PWA Active
 });
 
 const nextConfig = {
